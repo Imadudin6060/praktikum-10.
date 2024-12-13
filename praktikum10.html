@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #079cf1;
+        }
+
+        form {
+            width: 100%;
+            max-width: 400px;
+            background:  #09eb6f;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+
+        .error-border {
+            border: 1px solid red;
+        }
+
+        .success-message {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e0ffe0;
+            border: 1px solid #b2ffb2;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #06ac0c;
+            color: rgb(17, 16, 3);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #06d3a0;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="validationForm">
+        <h1 style="text-align: center; margin-bottom: 20px;">Form Validation</h1>
+        <div class="form-group">
+            <label for="name">Nama Pelanggan</label>
+            <input type="text" id="name" name="name" placeholder="maksimum 30 karakter">
+            <div class="error" id="nameError"></div>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="email format">
+            <div class="error" id="emailError"></div>
+        </div>
+        <div class="form-group">
+            <label for="departureTime">Jam Keberangkatan (00.00 - 23.59)</label>
+            <input type="text" id="departureTime" name="departureTime" placeholder="Contoh: 14.30">
+            <div class="error" id="timeError"></div>
+        </div>
+        <div class="form-group">
+            <label for="destination">Tujuan Keberangkatan</label>
+            <select id="destination" name="destination">
+                <option value="">-- Pilih Tujuan --</option>
+                <option value="Jakarta">Jakarta</option>
+                <option value="Yogyakarta">Yogyakarta</option>
+                <option value="Surabaya">Surabaya</option>
+                <option value="Bandung">Bandung</option>
+                <option value="Bali">Bali</option>
+            </select>
+            <div class="error" id="destinationError"></div>
+        </div>
+        <div class="form-group">
+            <label for="ticketCount">Jumlah Tiket (1 - 10)</label>
+            <input type="number" id="ticketCount" name="ticketCount" min="1" max="10">
+            <div class="error" id="ticketError"></div>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="successMessage" class="success-message" style="display: none;"></div>
+
+    <script>
+        document.getElementById('validationForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let isValid = true;
+
+            // Clear previous errors
+            document.querySelectorAll('.error').forEach(error => error.textContent = '');
+            document.querySelectorAll('input, select').forEach(input => input.classList.remove('error-border'));
+
+            // Validate Nama Pelanggan
+            const name = document.getElementById('name').value.trim();
+            if (name === '' || name.length > 30) {
+                isValid = false;
+                document.getElementById('nameError').textContent = 'Nama harus diisi (maksimum 30 karakter).';
+                document.getElementById('name').classList.add('error-border');
+            }
+
+            // Validate Email
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email === '' || !emailRegex.test(email)) {
+                isValid = false;
+                document.getElementById('emailError').textContent = 'Masukkan email yang valid.';
+                document.getElementById('email').classList.add('error-border');
+            }
+
+            // Validate Jam Keberangkatan
+            const departureTime = document.getElementById('departureTime').value.trim();
+            const timeRegex = /^([01]\d|2[0-3])\.[0-5]\d$/;
+            if (departureTime === '' || !timeRegex.test(departureTime)) {
+                isValid = false;
+                document.getElementById('timeError').textContent = 'Masukkan jam keberangkatan yang valid (format: HH.MM).';
+                document.getElementById('departureTime').classList.add('error-border');
+            }
+
+            // Validate Tujuan Keberangkatan
+            const destination = document.getElementById('destination').value.trim();
+            if (destination === '') {
+                isValid = false;
+                document.getElementById('destinationError').textContent = 'Tujuan keberangkatan harus dipilih.';
+                document.getElementById('destination').classList.add('error-border');
+            }
+
+            // Validate Jumlah Tiket
+            const ticketCount = document.getElementById('ticketCount').value.trim();
+            if (ticketCount === '' || isNaN(ticketCount) || ticketCount < 1 || ticketCount > 10) {
+                isValid = false;
+                document.getElementById('ticketError').textContent = 'Jumlah tiket harus antara 1 - 10.';
+                document.getElementById('ticketCount').classList.add('error-border');
+            }
+
+            // If valid, show success message
+            if (isValid) {
+                const successMessage = `
+                    <strong>Data Valid:</strong><br>
+                    Nama: ${name}<br>
+                    Email: ${email}<br>
+                    Jam Keberangkatan: ${departureTime}<br>
+                    Tujuan Keberangkatan: ${destination}<br>
+                    Jumlah Tiket: ${ticketCount}
+                `;
+                document.getElementById('successMessage').innerHTML = successMessage;
+                document.getElementById('successMessage').style.display = 'block';
+
+                // Optionally, you can reset the form
+                document.getElementById('validationForm').reset();
+            } else {
+                document.getElementById('successMessage').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>   
